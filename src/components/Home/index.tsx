@@ -1,60 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
-import {
-    PostContainer,
-    ImageContainer,
-    Image,
-    TextContainer,
-    Title,
-    Subtitle
-} from './style'
 
+import Post from './Post'
+
+interface InstagramBusinessAccount {
+    followers_count: number;
+    id: string;
+    media: InstagramPost[];
+}
 
 interface InstagramPost {
-  followers_count: number;
-  id: string;
-  media: Postagem[];
+  comments_count: number;
+  like_count: number;
+  thumbnail_url: string;
+  permalink: string;
+  media_url: string;
+  media_type: string;
+  insights: {
+    data: {
+      values: {
+        value: number;
+      }[];
+    }[];
+  };
 }
 
-interface Postagem { 
-    comments_count: number;
-    like_count: number;
-    thumbnail_url: string;
-    permalink: string;
-    media_url: string;
-    media_type: string;
-    insights: {
-      reach: number;
-      impressions: number;
-      engagement: number;
-    };
-}
 
 const Home: React.FC = () => { 
-    const [posts, setPosts] = useState<InstagramPost[]>([]);
-    const [follower, setFollower] = useState();
-    const [loading, setLoading] = useState(true);
+    const [posts, setPosts] = useState<InstagramBusinessAccount[]>([]);
+    const [follower, setFollower] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
 
     
     useEffect(() => {
         setLoading(false);
         const id = "5442295289125264";
         const urlGraph = `https://graph.facebook.com/v16.0/${id}`;
-        const token = 'EABHdDNqVJMEBAFZAMnOYzVF3AZAW0YbyGVHaPBeZBtOowj2utVqZCm2XhZBLHdGmDzrM38ZCetkxEZB5y7tU5MEsEt7jkjVXgJei16UTdeChUFf3slzZAFHdU5QlsOFn04TmwowwbksdB0pD7R4EK5p2p6Wtf8vyB7crMxB9yjeeVKofVsxHYPYZBxwjkyHkohSPDSJFMWtqN9o0bRNw5DQlBuR7aTWM8lYQZD';
+        const token = 'EABHdDNqVJMEBAKSZBXldx9szh7G7ndFudHOvBUwwwuFZCl6L76NnXVZCWTZBaZABc0TZA1QsFiZA0LM12S0nLZA4hB1bwf7ZCbOAP2jC7J3r4eCZBO2ytvnLfH1ulXNrhvONHxDzVfYKqqBlZB6Bp7z0QxOlhprwVdifztsS5Ndt0WlwI655JB0Qx9MOSZBqdjlzk3kZD';
         
         const fetchData = async () => {
             try {
                 const response = await axios.get(`${urlGraph}?fields=businesses{instagram_business_accounts{followers_count,id,media.limit(30){timestamp,comments_count,like_count,thumbnail_url,permalink,media_url,insights.metric(reach,impressions,engagement,saved)}}}&access_token=${token}`);
                 
                 if (response) {
-                    console.log(response.data.businesses.data[1].instagram_business_accounts.data[0].media.data);
-                    setPosts(response.data.businesses.data[1].instagram_business_accounts.data[0].media.data);
+                    const { media, followers_count } = response.data.businesses.data[1].instagram_business_accounts.data[0];
+                    setPosts(media.data);
+                    setFollower(followers_count);
                 } else {
                     console.log('vazio')
                 }
-                setFollower(response.data.businesses.data[1].instagram_business_accounts.data[0].followers_count);
 
             } catch (error) { console.log(error); }
         };        
@@ -68,61 +63,12 @@ const Home: React.FC = () => {
                 <div>Carregando...</div>
             ) : (
                     <div>
-                        {posts.map((post:any, i) => (
-                            <PostContainer key={i}>
-                                <ImageContainer>
-                                    <Image
-                                        src={post.thumbnail_url ? post.thumbnail_url : post.media_url}
-                                        alt=""
-                                    />
-                                </ImageContainer>
-                                <TextContainer>                                    
-                                    <Title>
-                                        <Link target='_blank' to={post.permalink}>{post.permalink}</Link>
-                                    </Title>
-                                    <Subtitle>Likes {post.like_count}</Subtitle>
-                                    <Subtitle>
-                                        Alcance: &nbsp;
-                                        {post.insights.data[0]
-	                                    ? post.insights.data[0].values[0].value
-                	                    : 0}
-                                    </Subtitle>
-                                    <Subtitle>
-                                         Impressões: &nbsp;
-                                        {post.insights.data[1]
-	                                    ? post.insights.data[1].values[0].value
-                	                    : 0}
-                                    </Subtitle>
-                                    <Subtitle>
-                                        Engajamento: &nbsp;
-                                        {post.insights.data[2]
-                                        ? post.insights.data[2].values[0].value
-                                        : 0}
-                                    </Subtitle>
-                                    <Subtitle>
-                                        Salvar: &nbsp;
-                                        {post.insights.data[3]
-                                        ? post.insights.data[3].values[0].value
-                                        : 0}
-                                    </Subtitle>
-                                </TextContainer>
-                               
-                            </PostContainer>
-                            
-                        ))}
+                        {posts && posts.length > 0 && posts.map((post:any, i) => <Post key={i} post={post} />)}
                     </div>
             )}
         </div>
     );
 } 
 
-// comments_count: number;
-//     media_url: string;
-//     media_type: string;
-//     insights: {
-//       reach: number;
-//       impressions: number;
-//       engagement: number;
-//     };
 
 export default Home;
