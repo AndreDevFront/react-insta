@@ -10,17 +10,17 @@ const Post: FC<PostProps> = ({ post }) => {
   return (
     <PostContainer>
       <ImageContainer>
-        <Image
-          src={post.thumbnail_url ? post.thumbnail_url : post.media_url}
-          alt=""
-        />
+        <a rel="noreferrer" target="_blank" href={post.permalink}>
+          <Image
+            src={post.thumbnail_url ? post.thumbnail_url : post.media_url}
+            alt=""
+          />
+        </a>
       </ImageContainer>
       <TextContainer>
-        <Title>
-          <a rel="noreferrer" target="_blank" href={post.permalink}>
-            {post.permalink}
-          </a>
-        </Title>
+        {/* <Title>
+          
+        </Title> */}
         <Subtitle>Likes {post.like_count}</Subtitle>
         <Subtitle>
           Alcance: &nbsp;
