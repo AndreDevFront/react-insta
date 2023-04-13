@@ -2,6 +2,7 @@ export interface InstagramBusinessAccount {
     followers_count: number;
     id: string;
     media: InstagramPost[];
+    
 }
 
 export interface InstagramPost {
