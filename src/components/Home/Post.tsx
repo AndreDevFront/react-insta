@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { InstagramPost } from './types/InstagramPost'
-import { PostContainer, ImageContainer, Image, TextContainer, Title, Subtitle } from './style';
+import { PostContainer, ImageContainer, Image, TextContainer,  Subtitle } from './style';
 
 interface PostProps {
   post: InstagramPost;
